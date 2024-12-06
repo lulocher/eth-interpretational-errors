@@ -7,7 +7,7 @@ library(wesanderson)
 # Read and prepare data
 ###
 
-path_data <- './../data/data_interpretational_errors.parquet'
+path_data <- './data/data_interpretational_errors.parquet'
 df <- read_parquet(path_data)
 
 df_mutated <- mutate(
@@ -16,7 +16,7 @@ df_mutated <- mutate(
   application_type = factor(application_type, levels=c('MR', 'RCT', 'Other')),
   discipline = factor(discipline, levels=c('Epidemiology', 'Medicine', 'Economics', 'Political Science')),
   framework_manual = case_when(
-    framework == 'Pragmatic' ~ framework,
+    framework == 'Pragmatic' ~ causal_framework,
     estimand_of_interest == 'LATE' ~ 'Ideal - Interest in LATE',
     T ~ 'Ideal - Targeted ATE'      
   ),
@@ -50,8 +50,8 @@ colors <- wes_palette('GrandBudapest2')
 create_similar_colors <- function(original_color){
   rgb_color <- hex2RGB(original_color)
   hcl_color <- as(rgb_color, "polarLUV")
-  color1 <- polarLUV(hcl_color@coords[1] - 5, hcl_color@coords[2] -5, hcl_color@coords[3] - 5)
-  color2 <- polarLUV(hcl_color@coords[1] - 10, hcl_color@coords[2] - 10, hcl_color@coords[3] - 10)
+  color1 <- polarLUV(hcl_color@coords[1] - 8, hcl_color@coords[2], hcl_color@coords[3])
+  color2 <- polarLUV(hcl_color@coords[1] - 16, hcl_color@coords[2], hcl_color@coords[3])
   color1_hex <- hex(color1)
   color2_hex <- hex(color2)
   return(
@@ -78,7 +78,7 @@ construct_data_framework <- function(data, grouping_var){
 }
 
 create_bar_plot <- function(data, ylab=element_blank()){ # Drop axis description
-  scheme <- c(colors[1], '#BE8AAC', colors[2])
+  scheme <- c('#BE8AAC', colors[1], colors[2])
   ggplot(data=data, aes(x=group, y=n, fill=framework_manual, label=sprintf("%.0f%% (%d)", perc, n))) +
     geom_bar(stat='identity') +
     scale_fill_manual(
